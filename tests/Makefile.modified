@@ -1,0 +1,93 @@
+#################################
+# RISCV Toolchain
+#################################
+
+TARGET = riscv64-unknown-elf
+
+#LINKER = /home/peeters/master-thesis/chipyard/.conda-env/riscv-tools/bin/riscv64-unknown-elf-gcc
+#COMPILER = /home/peeters/master-thesis/binaries/llvm/bin/clang
+
+LINKER = /home/peeters/master-thesis/binaries/toolchain/bin/riscv32-unknown-linux-gnu-gcc
+COMPILER = /home/peeters/master-thesis/binaries/toolchain/bin/riscv32-unknown-linux-gnu-gcc
+
+GCC = /home/peeters/master-thesis/binaries/toolchain/bin/riscv32-unknown-linux-gnu-gcc
+CXX = $(TARGET)-g++
+CP = $(TARGET)-objcopy
+#OBJDUMP = /home/peeters/master-thesis/binaries/llvm/bin/riscv64-unknown-elf-objdump
+#OBJDUMP = /home/peeters/master-thesis/binaries/llvm/bin/llvm-objdump
+OBJDUMP = /home/peeters/master-thesis/binaries/toolchain/bin/riscv32-unknown-linux-gnu-objdump
+DG = $(TARGET)-gdb
+SIZE = $(TARGET)-size
+
+
+#################################
+# Flags
+#################################
+
+# SoC Settings
+CLANGARCH = rv64imafdc_zicond_xbmis0p1
+GCCARCH = rv64imafdc_zicond_xbmis0p1
+#CLANGARCH = rv64imafdc_xbmis0p1
+#GCCARCH = rv64imafdc_xbmis0p1
+ABI = lp64d
+CLANGARCHFLAGS = -march=$(CLANGARCH) -mabi=$(ABI)
+GCCARCHFLAGS = -march=$(GCCARCH) -mabi=$(ABI)
+
+include libgloss.mk
+CFLAGS  = -std=gnu99 -fno-common -fno-builtin-printf -Wall -g -O2 -specs=htif_nano.specs
+#-menable-experimental-extensions
+CFLAGS += $(CLANGARCHFLAGS) -DPREDICTABLE=$(PREDICTABLE) -DVARIANT=$(VARIANT)
+LDFLAGS  = -static -mcmodel=medany #
+LDFLAGS += $(GCCARCHFLAGS)
+
+PROGRAMS = pwm blkdev accum charcount nic-loopback big-blkdev pingd \
+           streaming-passthrough streaming-fir nvdla spiflashread spiflashwrite fft gcd \
+           hello mt-hello symmetric simple_loop branch-test quicksort
+PROGRAMS = quicksort # simple_loop
+
+
+.DEFAULT_GOAL := default
+
+
+#################################
+# Build
+#################################
+
+spiflash.img: spiflash.py
+	python3 $<
+
+%.o: %.S
+#	$(GCC) $(CFLAGS) -D__ASSEMBLY__=1 -c $< -o $@
+	$(COMPILER) $(CFLAGS) -D__ASSEMBLY__=1 -c $< -o $@
+
+%.o: %.c mmio.h spiflash.h
+#	$(GCC) $(CFLAGS) -c $< -o $@
+	$(COMPILER) $(CFLAGS) -c $< -o $@
+
+%.riscv: %.o $(libgloss)
+	$(LINKER) $(LDFLAGS) $< -o $@
+
+%.dump: %.riscv
+	$(OBJDUMP) -D -S $< > $@
+
+%.o.dump: %.o
+	$(OBJDUMP) -D -S $< > $@
+
+%.o.x.dump: %.o
+	$(OBJDUMP) -x -S $< > $@
+
+
+#################################
+# Recipes
+#################################
+
+.PHONY: clean
+clean:
+	rm -f *.riscv *.o *.dump
+	$(if $(libgloss),rm -rf $(libgloss_builddir)/)
+
+.PHONY: default
+default: $(addsuffix .o, $(PROGRAMS)) $(addsuffix .riscv, $(PROGRAMS)) spiflash.img
+
+.PHONY: dumps
+dumps: $(addsuffix .dump, $(PROGRAMS)) $(addsuffix .o.dump, $(PROGRAMS)) $(addsuffix .o.x.dump, $(PROGRAMS))

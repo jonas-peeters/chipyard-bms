@@ -1,6 +1,6 @@
 [submodule "rocket-chip"]
 	path = generators/rocket-chip
-	url = https://github.com/chipsalliance/rocket-chip.git
+	url = https://github.com/jonas-peeters/rocket-chip-bms.git
 [submodule "testchipip"]
 	path = generators/testchipip
 	url = https://github.com/ucb-bar/testchipip.git
@@ -12,7 +12,7 @@
 	url = https://github.com/ucb-bar/riscv-torture.git
 [submodule "generators/boom"]
 	path = generators/boom
-	url = https://github.com/riscv-boom/riscv-boom.git
+	url = https://github.com/jonas-peeters/boom-bms.git
 [submodule "generators/hwacha"]
 	path = generators/hwacha
 	url = https://github.com/ucb-bar/hwacha.git
@@ -87,7 +87,7 @@
 	url = https://github.com/riscv/riscv-openocd.git
 [submodule "toolchains/riscv-tools/riscv-isa-sim"]
 	path = toolchains/riscv-tools/riscv-isa-sim
-	url = https://github.com/riscv-software-src/riscv-isa-sim.git
+	url = https://github.com/jonas-peeters/riscv-isa-sim-bms.git
 [submodule "toolchains/riscv-tools/riscv-tools-feedstock"]
 	path = toolchains/riscv-tools/riscv-tools-feedstock
 	url = https://github.com/ucb-bar/riscv-tools-feedstock.git
