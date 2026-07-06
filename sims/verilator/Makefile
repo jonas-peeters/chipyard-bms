@@ -134,7 +134,7 @@ PLATFORM_OPTS = $(shell \
 	else echo "$(CHIPYARD_VERILATOR_FLAGS)"; fi)
 
 # Use --timescale to approximate timescale behavior of pre-4.034
-TIMESCALE_OPTS := $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1 >= 4.034) { print "--timescale 1ns/1ps"; }')
+TIMESCALE_OPTS := $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1 >= 4.034) { print "--timescale 1ns/100ps"; }')
 
 # see: https://github.com/ucb-bar/riscv-mini/issues/31
 MAX_WIDTH_OPTS = $(shell verilator --version | perl -lne 'if (/(\d.\d+)/ && $$1 > 4.016) { print "--max-num-width 1048576"; }')
@@ -154,6 +154,7 @@ VERILATOR_NONCC_OPTS = \
 	$(VERILATOR_PREPROC_DEFINES) \
 	--top-module $(TB) \
 	--vpi \
+	--stats \
 	-f $(sim_common_files)
 
 #----------------------------------------------------------------------------------------
@@ -206,10 +207,10 @@ $(model_mk_debug): $(sim_common_files) $(EXTRA_SIM_REQS)
 # invoke make to make verilator sim rules
 #########################################################################################
 $(sim): $(model_mk) $(dramsim_lib)
-	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(TB).mk
+	$(MAKE) -j 10 VM_PARALLEL_BUILDS=1 -C $(model_dir) -f V$(TB).mk
 
 $(sim_debug): $(model_mk_debug) $(dramsim_lib)
-	$(MAKE) VM_PARALLEL_BUILDS=1 -C $(model_dir_debug) -f V$(TB).mk
+	$(MAKE) -j 10 VM_PARALLEL_BUILDS=1 -C $(model_dir_debug) -f V$(TB).mk
 
 #########################################################################################
 # create a verilator vpd rule
