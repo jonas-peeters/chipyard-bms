@@ -34,6 +34,37 @@ class BigCustomBoomConfig extends Config(
   new chipyard.config.WithSystemBusWidth(128) ++
   new chipyard.config.AbstractConfig)
 
+// BMS+branch macro-op fusion variants (alternative 1b). Same cores as the
+// configs above but with the fusion datapath elaborated; the runtime plusarg
+// +bms_fusion_enable=0 falls back to the legacy BMS/BJR behavior.
+class FusedSmallBoomConfig extends Config(
+  new boom.common.WithBmsFusion ++
+  new boom.common.WithNSmallBooms(1) ++
+  new chipyard.config.AbstractConfig)
+
+class FusedMediumBoomConfig extends Config(
+  new boom.common.WithBmsFusion ++
+  new boom.common.WithNMediumBooms(1) ++
+  new chipyard.config.AbstractConfig)
+
+class FusedLargeBoomConfig extends Config(
+  new boom.common.WithBmsFusion ++
+  new boom.common.WithNLargeBooms(1) ++
+  new chipyard.config.WithSystemBusWidth(128) ++
+  new chipyard.config.AbstractConfig)
+
+class FusedMegaBoomConfig extends Config(
+  new boom.common.WithBmsFusion ++
+  new boom.common.WithNMegaBooms(1) ++
+  new chipyard.config.WithSystemBusWidth(128) ++
+  new chipyard.config.AbstractConfig)
+
+class FusedCustomBoomConfig extends Config(
+  new boom.common.WithBmsFusion ++
+  new boom.common.WithNCustomBooms(1) ++
+  new chipyard.config.WithSystemBusWidth(128) ++
+  new chipyard.config.AbstractConfig)
+
 class DualSmallBoomConfig extends Config(
   new boom.common.WithNSmallBooms(2) ++                          // 2 boom cores
   new chipyard.config.AbstractConfig)
